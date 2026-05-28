@@ -56,3 +56,10 @@ def get_ai_response(user_message):
     )
 
     return response.choices[0].message.content
+
+
+
+
+    except Exception as e:
+        print("ERROR:", e)   # ←これ追加
+        return "エラーが発生しました"
