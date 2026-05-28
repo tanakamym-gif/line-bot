@@ -1,9 +1,14 @@
 from flask import Flask, request
 import requests
+import openai
 
 app = Flask(__name__)
 
+# LINE
 CHANNEL_ACCESS_TOKEN = "WCJj9rLrkhwyjkpRg3WCdvqBiTL8ob8ELb8r4q+VWqPkLRaA7wx5HrR5HqAQxC7KDWCgKoegQitrIRMS/8hHaHvyWm7RtznbmQ/b6L8dTXqar8xmiPJzzxTB+6UyTpEIfWcj+DGhLqLBTeFEYsjSrwdB04t89/1O/w1cDnyilFU="
+
+# OpenAI
+openai.api_key = "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"
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -14,7 +19,7 @@ def callback():
             reply_token = event["replyToken"]
             user_message = event["message"]["text"]
 
-            # Copilotへ送信
+            # AIで応答生成
             ai_response = get_ai_response(user_message)
 
             # LINEへ返信
@@ -35,7 +40,7 @@ def reply(reply_token, text):
         "messages": [
             {
                 "type": "text",
-                "text": text   # ← AIの返答をそのまま返す
+                "text": text
             }
         ]
     }
@@ -43,13 +48,13 @@ def reply(reply_token, text):
     requests.post(url, headers=headers, json=data)
 
 def get_ai_response(user_message):
-    url = "https://defaulta7a81c19a27344e19693b110b3b63c.a9.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/aa60a640e2d344a8bc943568d6c5b277/triggers/manual/paths/invoke?api-version=1"
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "あなたは親切で丁寧な日本語アシスタントです。簡潔に回答してください。"},
+            {"role": "user", "content": user_message}
+        ],
+        max_tokens=300
+    )
 
-    response = requests.post(url, json={
-        "message": user_message
-    })
-
-    print(response.text)
-
-    result = response.json()
-    return result.get("reply", "回答が取得できませんでした")
+    return response.choices[0].message["content"]
