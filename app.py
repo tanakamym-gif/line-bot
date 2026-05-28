@@ -19,12 +19,39 @@ def callback():
             reply_token = event["replyToken"]
             user_message = event["message"]["text"]
 
-            # AI応答
             ai_response = get_ai_response(user_message)
-
-            # LINEへ返信
             reply(reply_token, ai_response)
 
     return "OK"
 
 def reply(reply_token, text):
+    url = "https://api.line.me/v2/bot/message/reply"
+
+    headers = {
+        "Authorization": f"Bearer {CHANNEL_ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "replyToken": reply_token,
+        "messages": [
+            {
+                "type": "text",
+                "text": text
+            }
+        ]
+    }
+
+    requests.post(url, headers=headers, json=data)
+
+def get_ai_response(user_message):
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "あなたは親切で丁寧な日本語アシスタントです。簡潔に回答してください。"},
+            {"role": "user", "content": user_message}
+        ],
+        max_tokens=300
+    )
+
+    return response.choices[0].message.content
