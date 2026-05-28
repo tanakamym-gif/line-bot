@@ -49,5 +49,7 @@ def get_ai_response(user_message):
         "message": user_message
     })
 
+    print(response.text)
+
     result = response.json()
     return result.get("reply", "回答が取得できませんでした")
