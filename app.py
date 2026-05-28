@@ -4,27 +4,31 @@ from openai import OpenAI
 
 app = Flask(__name__)
 
-# LINE
+# LINEアクセストークン（そのまま使う）
 CHANNEL_ACCESS_TOKEN = "WCJj9rLrkhwyjkpRg3WCdvqBiTL8ob8ELb8r4q+VWqPkLRaA7wx5HrR5HqAQxC7KDWCgKoegQitrIRMS/8hHaHvyWm7RtznbmQ/b6L8dTXqar8xmiPJzzxTB+6UyTpEIfWcj+DGhLqLBTeFEYsjSrwdB04t89/1O/w1cDnyilFU="
 
-# OpenAI
+# OpenAI（※後で環境変数化が推奨）
 client = OpenAI(api_key="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")
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
     body = request.json
 
-    for event in body["events"]:
-        if event["type"] == "message":
-            reply_token = event["replyToken"]
-            user_message = event["message"]["text"]
+    for event in body.get("events", []):
+        if event.get("type") == "message":
+            reply_token = event.get("replyToken")
+            message = event.get("message", {})
+            user_message = message.get("text", "")
 
-            # OpenAIで応答
+            # AI応答
             ai_response = get_ai_response(user_message)
 
+            # LINEへ返信
             reply(reply_token, ai_response)
 
     return "OK"
+
 
 def reply(reply_token, text):
     url = "https://api.line.me/v2/bot/message/reply"
@@ -46,20 +50,30 @@ def reply(reply_token, text):
 
     requests.post(url, headers=headers, json=data)
 
+
 def get_ai_response(user_message):
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "あなたは親切で丁寧な日本語アシスタントです。簡潔に答えてください。"},
-            {"role": "user", "content": user_message}
-        ]
-    )
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",  # ← 安定モデル
+            messages=[
+                {
+                    "role": "system",
+                    "content": "あなたは企業の問い合わせ対応担当です。日本語で丁寧に簡潔に回答してください。"
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ],
+            max_tokens=300
+        )
 
-    return response.choices[0].message.content
-
-
-
+        return response.choices[0].message.content
 
     except Exception as e:
-        print("ERROR:", e)   # ←これ追加
-        return "エラーが発生しました"
+        print("OPENAI ERROR:", e)
+        return "現在AI応答に問題が発生しています。時間をおいて再度お試しください。"
+
+
+if __name__ == "__main__":
+    app.run(port=5000)
