@@ -14,9 +14,11 @@ def callback():
             reply_token = event["replyToken"]
             user_message = event["message"]["text"]
 
-            
-ai_response = get_ai_response(user_message)
-reply(reply_token, ai_response)
+            # Copilotへ送信
+            ai_response = get_ai_response(user_message)
+
+            # LINEへ返信
+            reply(reply_token, ai_response)
 
     return "OK"
 
@@ -31,7 +33,10 @@ def reply(reply_token, text):
     data = {
         "replyToken": reply_token,
         "messages": [
-            {"type": "text", "text": f"あなたが言った: {text}"}
+            {
+                "type": "text",
+                "text": text   # ← AIの返答をそのまま返す
+            }
         ]
     }
 
@@ -45,5 +50,4 @@ def get_ai_response(user_message):
     })
 
     result = response.json()
-    return result["reply"]
-    
+    return result.get("reply", "回答が取得できませんでした")
