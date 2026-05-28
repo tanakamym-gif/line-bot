@@ -14,7 +14,9 @@ def callback():
             reply_token = event["replyToken"]
             user_message = event["message"]["text"]
 
-            reply(reply_token, user_message)
+            
+ai_response = get_ai_response(user_message)
+reply(reply_token, ai_response)
 
     return "OK"
 
@@ -34,3 +36,14 @@ def reply(reply_token, text):
     }
 
     requests.post(url, headers=headers, json=data)
+
+def get_ai_response(user_message):
+    url = "https://defaulta7a81c19a27344e19693b110b3b63c.a9.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/aa60a640e2d344a8bc943568d6c5b277/triggers/manual/paths/invoke?api-version=1"
+
+    response = requests.post(url, json={
+        "message": user_message
+    })
+
+    result = response.json()
+    return result["reply"]
+    
