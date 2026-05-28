@@ -19,7 +19,9 @@ def callback():
             reply_token = event["replyToken"]
             user_message = event["message"]["text"]
 
+            # OpenAIで応答
             ai_response = get_ai_response(user_message)
+
             reply(reply_token, ai_response)
 
     return "OK"
@@ -48,10 +50,9 @@ def get_ai_response(user_message):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "あなたは親切で丁寧な日本語アシスタントです。簡潔に回答してください。"},
+            {"role": "system", "content": "あなたは親切で丁寧な日本語アシスタントです。簡潔に答えてください。"},
             {"role": "user", "content": user_message}
-        ],
-        max_tokens=300
+        ]
     )
 
     return response.choices[0].message.content
