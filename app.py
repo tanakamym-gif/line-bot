@@ -8,7 +8,7 @@ app = Flask(__name__)
 CHANNEL_ACCESS_TOKEN = "WCJj9rLrkhwyjkpRg3WCdvqBiTL8ob8ELb8r4q+VWqPkLRaA7wx5HrR5HqAQxC7KDWCgKoegQitrIRMS/8hHaHvyWm7RtznbmQ/b6L8dTXqar8xmiPJzzxTB+6UyTpEIfWcj+DGhLqLBTeFEYsjSrwdB04t89/1O/w1cDnyilFU="
 
 # OpenAI（※後で環境変数化が推奨）
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="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")
 
 
 @app.route("/callback", methods=['POST'])
