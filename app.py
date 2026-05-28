@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-CHANNEL_ACCESS_TOKEN = "ここにアクセストークン"
+CHANNEL_ACCESS_TOKEN = "WCJj9rLrkhwyjkpRg3WCdvqBiTL8ob8ELb8r4q+VWqPkLRaA7wx5HrR5HqAQxC7KDWCgKoegQitrIRMS/8hHaHvyWm7RtznbmQ/b6L8dTXqar8xmiPJzzxTB+6UyTpEIfWcj+DGhLqLBTeFEYsjSrwdB04t89/1O/w1cDnyilFU="
 
 @app.route("/callback", methods=['POST'])
 def callback():
